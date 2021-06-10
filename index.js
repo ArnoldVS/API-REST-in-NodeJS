@@ -4,7 +4,10 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
-    // correr el servidor
+
+const Product = require('./models/product')
+
+// correr el servidor
 const app = express()
 const port = process.env.PORT || 3003
 
@@ -12,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.get('/api/product', (req, res) => {
-    res.send(200, { products: [] })
+    res.send(200, { Products: [] })
 })
 
 app.get('/api/product/:productId', (req, res) => {
@@ -20,8 +23,21 @@ app.get('/api/product/:productId', (req, res) => {
 })
 
 app.post('/api/product', (req, res) => {
+    console.log('POST /api/product')
     console.log(req.body)
-    res.status(200).send({ message: 'El producto fue agregado' })
+
+    let product = new Product()
+    product.name = req.body.name
+    product.picture = req.body.picture
+    product.price = req.body.price
+    product.category = req.body.category
+    product.description = req.body.description
+
+    product.save((err, productStored) => {
+        if (err) res.status(500).send({ message: `Error al guardar en la base de datos: ${err}` })
+
+        res.status(200).send({ product: productStored })
+    })
 })
 
 app.put('/api/product/:productId', (req, res) => {
