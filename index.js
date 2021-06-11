@@ -1,5 +1,4 @@
 'use strict'
-//sintaxis javascript 6
 
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -53,16 +52,33 @@ app.post('/api/product', (req, res) => {
 })
 
 app.put('/api/product/:productId', (req, res) => {
+    let productId = req.params.productId
+    let update = req.body
 
+    Product.findByIdAndUpdate(productId, update, (err, productUpdate) => {
+        if (err) res.status(500).send({ message: `Error al actualizar el producto: ${err}` })
+
+        res.status(200).send({ product: productUpdate })
+    })
 })
 
-app.delete('/api/proyect/:proyecId', (req, res) => {
+app.delete('/api/product/:productId', (req, res) => {
+    let productId = req.params.productId
 
+    Product.findById(productId, (err, product) => {
+        if (err) res.status(500).send({ message: `Error al borrar el producto: ${err}` })
+
+        product.remove((err, productId) => {
+            if (err) res.status(500).send({ mesage: `Error al borrar el producto: ${err}` })
+            res.status(200).send({ message: 'EL producto ha sido eliminado' })
+        })
+    })
 })
 
 // Inicializar la base de datos 
 mongoose.set('useNewUrlParser', true)
 mongoose.set('useUnifiedTopology', true)
+mongoose.set('useFindAndModify', false)
 mongoose.connect('mongodb://localhost:27017/shop', (err, res) => {
     if (err) {
         return console.log(`Error al conectar a la base de datos: ${err}`)
