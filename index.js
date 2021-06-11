@@ -15,11 +15,23 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.get('/api/product', (req, res) => {
-    res.send(200, { Products: [] })
+    Product.find({}, (err, products) => {
+        if (err) return res.status(500).send({ message: `Error al realizar la peticion: ${err}` })
+        if (!products) return res.status(404).send({ message: `El producto no existe` })
+
+        res.status(500).send({ products })
+    })
 })
 
 app.get('/api/product/:productId', (req, res) => {
+    let productId = req.params.productId
 
+    Product.findById(productId, (err, product) => {
+        if (err) return res.status(500).send({ message: `Error al realizar la peticion: ${err}` })
+        if (!product) return res.status(404).send({ message: `El producto no existe` })
+
+        res.status(200).send({ product })
+    })
 })
 
 app.post('/api/product', (req, res) => {
@@ -48,6 +60,9 @@ app.delete('/api/proyect/:proyecId', (req, res) => {
 
 })
 
+// Inicializar la base de datos 
+mongoose.set('useNewUrlParser', true)
+mongoose.set('useUnifiedTopology', true)
 mongoose.connect('mongodb://localhost:27017/shop', (err, res) => {
     if (err) {
         return console.log(`Error al conectar a la base de datos: ${err}`)
