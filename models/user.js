@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt-nodejs')
 const crypto = require('crypto')
 
 const Schema = mongoose.Schema
-const { use } = require('../routes')
+const { use } = require('../routes') // Revisar
 
 const UserSchema = new Schema({
     email: { type: String, unique: true, lowercase: true },
